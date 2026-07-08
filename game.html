@@ -126,12 +126,14 @@ button{cursor:pointer;border:none;outline:none;font-family:inherit;}
 .spell-slots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:40px;}
 .spell-slot{width:30px;height:40px;border-bottom:3px solid #9aa7bd;display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:900;color:var(--on);}
 .spell-slot.filled{border-color:#4CAF50;}
+.spell-gap{width:16px;}
 .spell-hintline{font-size:12px;color:var(--dim);text-align:center;min-height:16px;}
 .spell-kb{display:flex;flex-direction:column;gap:6px;width:100%;max-width:470px;}
 .spell-kb-row{display:flex;gap:4px;justify-content:center;}
 .spell-key{flex:1;max-width:42px;height:46px;border-radius:8px;background:var(--sur2);border:1px solid rgba(0,0,0,.12);font-size:16px;font-weight:800;color:var(--on);cursor:pointer;}
 .spell-key:active{background:var(--sur3);transform:scale(.94);}
 .spell-key-bs{max-width:60px;font-size:19px;}
+.spell-key-space{max-width:none;flex:1;font-size:13px;font-weight:700;letter-spacing:.15em;}
 .spell-actions{display:flex;gap:8px;width:100%;max-width:470px;margin-top:2px;}
 .spell-act{flex:1;height:46px;border-radius:11px;font-size:14px;font-weight:800;cursor:pointer;border:none;color:#fff;}
 .spell-act:active{transform:scale(.96);}
@@ -1626,8 +1628,8 @@ let spellActive=false, spellSession=false, spellCur=null, spellTyped='', spellHi
 const SPELL_LV=9; // XP・見た目は5級相当
 
 function getSpellPool(){
-  // 前編(lv9)の単語のうち、1語（アルファベットのみ）を対象にする
-  return QUESTIONS.filter(q=>q.lv===9 && /^[A-Za-z]+$/.test((q.kw||'').trim())).map(q=>{
+  // 前編(lv9)の単語100語すべてを対象にする（アルファベットとスペースのみ。post office 等の複合語も含む）
+  return QUESTIONS.filter(q=>q.lv===9 && /^[A-Za-z ]+$/.test((q.kw||'').trim())).map(q=>{
     const m=q.q.match(/^「([^」]+)」/);
     const meaning=m?m[1]:q.c[q.a];
     return {word:q.kw.trim(), meaning, em:q.em||'📝', yomi:q.yomi||'', exp:q.exp||''};
@@ -1713,12 +1715,21 @@ function buildSpellKeyboard(){
     }
     kb.appendChild(rowEl);
   });
+  // 複合語（post office 等）用のスペースキー。単語にスペースが含まれるときだけ表示
+  if(spellCur.word.includes(' ')){
+    const spRow=document.createElement('div'); spRow.className='spell-kb-row';
+    const spBtn=document.createElement('button'); spBtn.className='spell-key spell-key-space'; spBtn.textContent='space';
+    spBtn.onclick=()=>spellType(' ');
+    spRow.appendChild(spBtn);
+    kb.appendChild(spRow);
+  }
 }
 
 function renderSpellSlots(){
   const w=spellCur.word, slots=document.getElementById('spell-slots');
   let html='';
   for(let i=0;i<w.length;i++){
+    if(w[i]===' '){ html+='<div class="spell-gap"></div>'; continue; }
     const ch=spellTyped[i];
     html+=`<div class="spell-slot${ch?' filled':''}">${ch?ch.toUpperCase():''}</div>`;
   }
@@ -1770,6 +1781,7 @@ document.addEventListener('keydown',e=>{
   if(!spellActive)return;
   if(e.key==='Backspace'){e.preventDefault();spellBackspace();}
   else if(e.key==='Enter'){e.preventDefault();spellSubmit();}
+  else if(e.key===' '){e.preventDefault();spellType(' ');}
   else if(/^[a-zA-Z]$/.test(e.key)){spellType(e.key.toLowerCase());}
 });
 function spellRowHTML(){
