@@ -123,11 +123,11 @@ button{cursor:pointer;border:none;outline:none;font-family:inherit;}
 .choice-btn.disabled{pointer-events:none;opacity:.5;}
 /* スペル編 */
 .spell-wrap{display:flex;flex-direction:column;gap:11px;align-items:center;width:100%;}
-.spell-slots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:40px;}
-.spell-slot{width:30px;height:40px;border-bottom:3px solid #9aa7bd;display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:900;color:var(--on);}
+.spell-slots{display:flex;gap:6px;flex-wrap:nowrap;justify-content:center;height:40px;}
+.spell-slot{width:30px;height:40px;flex-shrink:0;border-bottom:3px solid #9aa7bd;display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:900;color:var(--on);transition:width .1s,font-size .1s;}
 .spell-slot.filled{border-color:#4CAF50;}
-.spell-gap{width:16px;}
-.spell-hintline{font-size:12px;color:var(--dim);text-align:center;min-height:16px;}
+.spell-gap{width:16px;flex-shrink:0;}
+.spell-hintline{font-size:12px;color:var(--dim);text-align:center;height:32px;line-height:16px;display:flex;align-items:center;justify-content:center;padding:0 6px;}
 .spell-kb{display:flex;flex-direction:column;gap:6px;width:100%;max-width:470px;}
 .spell-kb-row{display:flex;gap:4px;justify-content:center;}
 .spell-key{flex:1;max-width:42px;height:46px;border-radius:8px;background:var(--sur2);border:1px solid rgba(0,0,0,.12);font-size:16px;font-weight:800;color:var(--on);cursor:pointer;}
@@ -1623,13 +1623,21 @@ function startQuiz(lv,stageId){
 }
 function shuffle(a){return[...a].sort(()=>Math.random()-.5);}
 
-// ============ スペル編（英検5級・単語のつづり／前編lv9の語を流用） ============
+// ============ スペル編（各級・単語のつづり／各級前編の語を流用） ============
 let spellActive=false, spellSession=false, spellCur=null, spellTyped='', spellHintCount=0;
-const SPELL_LV=9; // XP・見た目は5級相当
+let spellLv=9; // 現在プレイ中のスペル編がどの級のものか（前編と同じlv番号）
+// 前編（単語のみ）を持つレベル＝スペル編の対象。各級の色は LV_INFO と合わせている
+const SPELL_META={
+  9: {label:'英検®5級相当',    color:'#8D6E63'},
+  11:{label:'英検®4級相当',    color:'#5C6BC0'},
+  13:{label:'英検®3級相当',    color:'#26A69A'},
+  15:{label:'英検®準2級相当', color:'#5C6BC0'},
+};
+const SPELL_LEVELS=[9,11,13,15];
 
-function getSpellPool(){
-  // 前編(lv9)の単語100語すべてを対象にする（アルファベットとスペースのみ。post office 等の複合語も含む）
-  return QUESTIONS.filter(q=>q.lv===9 && /^[A-Za-z ]+$/.test((q.kw||'').trim())).map(q=>{
+function getSpellPool(lv){
+  // 対象レベルの前編の単語すべてを対象にする（アルファベットとスペースのみ。post office 等の複合語も含む）
+  return QUESTIONS.filter(q=>q.lv===lv && /^[A-Za-z ]+$/.test((q.kw||'').trim())).map(q=>{
     const m=q.q.match(/^「([^」]+)」/);
     const meaning=m?m[1]:q.c[q.a];
     return {word:q.kw.trim(), meaning, em:q.em||'📝', yomi:q.yomi||'', exp:q.exp||''};
@@ -1637,25 +1645,26 @@ function getSpellPool(){
 }
 
 // スペル編：問題数選択画面
-function startSpellStage(){
-  spellSession=true;
-  const pool=getSpellPool();
+function startSpellStage(lv){
+  spellSession=true; spellLv=lv;
+  const meta=SPELL_META[lv]||SPELL_META[9];
+  const pool=getSpellPool(lv);
   const header=document.getElementById('stage-header-title');
-  header.textContent='✏️ 英検®5級相当 スペル編';
-  header.style.color='#8D6E63';
+  header.textContent='✏️ '+meta.label+' スペル編';
+  header.style.color=meta.color;
   const list=document.getElementById('stage-list');
   list.innerHTML='';
   const hero=document.createElement('div');
   hero.className='count-hero';
-  hero.innerHTML=`<div class="count-hero-icon">⌨️</div><div class="count-hero-name" style="color:#8D6E63">スペル編</div><div class="count-hero-sub">前編の単語 ${pool.length}語 ／ アルファベットで つづろう！</div>`;
+  hero.innerHTML=`<div class="count-hero-icon">⌨️</div><div class="count-hero-name" style="color:${meta.color}">スペル編</div><div class="count-hero-sub">前編の単語 ${pool.length}語 ／ アルファベットで つづろう！</div>`;
   list.appendChild(hero);
   const lbl=document.createElement('div'); lbl.className='count-label'; lbl.textContent='⚡ 何問チャレンジする？'; list.appendChild(lbl);
   const grid=document.createElement('div'); grid.className='count-grid';
   [{n:5,label:'ためし'},{n:10,label:'さくっと'},{n:20,label:'しっかり'},{n:pool.length,label:'ぜんぶ',featured:true}].forEach(({n,label,featured})=>{
     const cap=Math.min(n,pool.length); if(cap<=0)return;
     const btn=document.createElement('button'); btn.className='count-btn'+(featured?' featured':'');
-    btn.style.setProperty('--gc','#8D6E63');
-    btn.innerHTML=`<div class="count-btn-num" style="color:${featured?'var(--gold)':'#8D6E63'}">${cap}問</div><div class="count-btn-lbl">${label}</div>`;
+    btn.style.setProperty('--gc',meta.color);
+    btn.innerHTML=`<div class="count-btn-num" style="color:${featured?'var(--gold)':meta.color}">${cap}問</div><div class="count-btn-lbl">${label}</div>`;
     btn.onclick=()=>startSpellQuiz(cap);
     grid.appendChild(btn);
   });
@@ -1665,14 +1674,15 @@ function startSpellStage(){
 
 function startSpellQuiz(count){
   spellSession=true;
-  currentLv=SPELL_LV;
-  const pool=shuffle(getSpellPool()).slice(0,count);
+  currentLv=spellLv;
+  const meta=SPELL_META[spellLv]||SPELL_META[9];
+  const pool=shuffle(getSpellPool(spellLv)).slice(0,count);
   if(!pool.length)return;
-  quizQueue=pool.map(p=>({spell:true, lv:SPELL_LV, word:p.word, meaning:p.meaning, em:p.em, yomi:p.yomi, exp:p.exp,
+  quizQueue=pool.map(p=>({spell:true, lv:spellLv, word:p.word, meaning:p.meaning, em:p.em, yomi:p.yomi, exp:p.exp,
     kw:p.word, c:[p.word], a:0, q:'「'+p.meaning+'」を 英語で つづろう', stage:'spell'}));
   quizCountSelected=quizQueue.length;
   quizIdx=0;score=0;streak=LS.getStats().curStreak||0;quizXP=0;quizLog=[];
-  document.getElementById('quiz-prog-fill').style.background='#8D6E63';
+  document.getElementById('quiz-prog-fill').style.background=meta.color;
   showScreen('screen-quiz');
   renderQuiz();
 }
@@ -1727,12 +1737,22 @@ function buildSpellKeyboard(){
 
 function renderSpellSlots(){
   const w=spellCur.word, slots=document.getElementById('spell-slots');
+  // 単語の長さに応じてスロット幅・間隔を縮小し、常に1行に収まるようにする（折り返しで縦位置がずれるのを防ぐ）
+  // 幅の基準は #choices（中身に依存せず安定した幅を持つ親コンテナ）から取る
+  const letterCount=w.replace(/ /g,'').length;
+  const gapCount=(w.match(/ /g)||[]).length;
+  const container=document.getElementById('choices');
+  const avail=(container&&container.clientWidth?container.clientWidth:340)-24;
+  let slotW=30, gap=6, fontPx=23;
+  const need=()=> letterCount*slotW + Math.max(0,letterCount-1)*gap + gapCount*16;
+  while(need()>avail && slotW>16){ slotW-=1; if(gap>2)gap-=1; fontPx=Math.max(14,fontPx-1); }
   let html='';
   for(let i=0;i<w.length;i++){
     if(w[i]===' '){ html+='<div class="spell-gap"></div>'; continue; }
     const ch=spellTyped[i];
-    html+=`<div class="spell-slot${ch?' filled':''}">${ch?ch.toUpperCase():''}</div>`;
+    html+=`<div class="spell-slot${ch?' filled':''}" style="width:${slotW}px;font-size:${fontPx}px;">${ch?ch.toUpperCase():''}</div>`;
   }
+  slots.style.gap=gap+'px';
   slots.innerHTML=html;
 }
 
@@ -1785,12 +1805,14 @@ document.addEventListener('keydown',e=>{
   else if(/^[a-zA-Z]$/.test(e.key)){spellType(e.key.toLowerCase());}
 });
 function spellRowHTML(){
-  if(!isUnlocked(9))return '';
-  return `<div class="stage-sel-row" onclick="startSpellStage()">
-    <div class="stage-sel-icon">⌨️</div>
-    <div class="stage-sel-info"><div class="stage-sel-name">英検®5級相当 スペル編</div></div>
-    <div class="stage-sel-right"><span style="color:#8D6E63;font-weight:800">✏️</span></div>
-  </div>`;
+  return SPELL_LEVELS.filter(lv=>isUnlocked(lv)).map(lv=>{
+    const meta=SPELL_META[lv];
+    return `<div class="stage-sel-row" onclick="startSpellStage(${lv})">
+      <div class="stage-sel-icon">⌨️</div>
+      <div class="stage-sel-info"><div class="stage-sel-name">${meta.label} スペル編</div></div>
+      <div class="stage-sel-right"><span style="color:${meta.color};font-weight:800">✏️</span></div>
+    </div>`;
+  }).join('');
 }
 
 function renderQuiz(){
@@ -1830,8 +1852,20 @@ function renderQuiz(){
     fill:'空所補充', dialog:'会話文', order:'和文→英語',
   };
   const _lbl=STAGE_LABELS[q.stage];
-  if(_lbl){kwEl.textContent='📖 '+_lbl+(q.kw?'：'+q.kw:'');}
-  else{kwEl.textContent='📖 '+(q.kw||'');}
+  // 見出し語(kw)に正解が単語として含まれる場合、出題中に表示すると答えが分かってしまうため隠す
+  // （問題文の中に既に正解の単語が出ている場合は、元々答えの手がかりではないので隠さない）
+  const _correctText=(q.c&&typeof q.a==='number')?String(q.c[q.a]||''):'';
+  function _escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+  let _kwLeaksAnswer=false;
+  if(q.kw && _correctText){
+    try{
+      const _re=new RegExp('\\b'+_escRe(_correctText.trim())+'\\b','i');
+      _kwLeaksAnswer=_re.test(q.kw) && !_re.test(q.q);
+    }catch(e){}
+  }
+  const _kwShown=_kwLeaksAnswer?'':q.kw;
+  if(_lbl){kwEl.textContent='📖 '+_lbl+(_kwShown?'：'+_kwShown:'');}
+  else{kwEl.textContent='📖 '+(_kwShown||'');}
   document.getElementById('quiz-q').textContent=q.q;
 
   // 和文→英語（大問3相当）の問題は、日本語の意味を問題文の上にガイド表示する
