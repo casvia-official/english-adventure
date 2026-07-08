@@ -18,7 +18,7 @@
   --bg:#ffffff;--sur:#f5f6fa;--sur2:#eef0f6;--sur3:#e2e5ee;
   --on:#22232e;--dim:#767b8c;
   --lv1:#4CAF50;--lv2:#2196F3;--lv3:#FF9800;--lv4:#F44336;--lv5:#9C27B0;--lv6:#FFC107;
-  --gold:#FFC107;--xp:#7C4DFF;
+  --gold:#B45309;--xp:#7C4DFF;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;background:var(--bg);color:var(--on);min-height:100vh;overflow-x:hidden;padding-bottom:88px;}
@@ -179,11 +179,11 @@ button{cursor:pointer;border:none;outline:none;font-family:inherit;}
 .ow-emoji{font-size:48px;animation:popIn .35s;}
 .ow-big{font-size:34px;font-weight:900;color:#FF9800;animation:slideUp .3s .05s both;}
 .ow-sub{font-size:15px;animation:slideUp .3s .1s both;}
-.ow-answer-card{width:100%;max-width:430px;background:var(--sur2);border:1px solid rgba(0,0,0,.1);border-radius:14px;padding:14px 18px;animation:slideUp .3s .15s both;text-align:left;}
+.ow-answer-card{width:100%;max-width:430px;background:rgba(76,175,80,.12);border:1.5px solid rgba(76,175,80,.4);border-radius:14px;padding:14px 18px;animation:slideUp .3s .15s both;text-align:left;}
 .ow-albl{font-size:10px;color:var(--dim);margin-bottom:3px;}
-.ow-answer{font-size:21px;font-weight:900;color:var(--gold);margin-bottom:8px;}
-.ow-exp{font-size:13px;line-height:1.7;}
-.ow-trivia-card{width:100%;max-width:430px;background:rgba(255,193,7,.07);border:1px solid rgba(255,193,7,.2);border-radius:12px;padding:11px 15px;animation:slideUp .3s .28s both;text-align:left;}
+.ow-answer{font-size:21px;font-weight:900;color:#1b5e20;margin-bottom:8px;}
+.ow-exp{font-size:13px;line-height:1.7;color:var(--on);}
+.ow-trivia-card{width:100%;max-width:430px;background:rgba(255,193,7,.14);border:1.5px solid rgba(255,193,7,.4);border-radius:12px;padding:11px 15px;animation:slideUp .3s .28s both;text-align:left;}
 .ow-tlbl{font-size:10px;color:var(--gold);font-weight:700;margin-bottom:3px;}
 .ow-trivia{font-size:13px;line-height:1.7;}
 .ow-next-row{display:flex;flex-direction:column;gap:9px;width:100%;max-width:300px;animation:slideUp .3s .42s both;}
@@ -582,7 +582,7 @@ button{cursor:pointer;border:none;outline:none;font-family:inherit;}
   <div class="oc-particles" id="oc-particles"></div>
   <div class="oc-big">🎉 正解！</div>
   <div class="oc-zukan">
-    <div class="oc-zukan-lbl">📖 ことば</div>
+    <div class="oc-zukan-lbl">📖 えいご</div>
     <div class="oc-kw" id="oc-kw"></div>
     <div class="oc-yomi" id="oc-yomi" style="display:none"></div>
     <div class="oc-yaku" id="oc-yaku" style="display:none"></div>
@@ -604,9 +604,9 @@ button{cursor:pointer;border:none;outline:none;font-family:inherit;}
   <div class="ow-emoji">😅</div>
   <div class="ow-big">惜しい！</div>
   <div class="ow-sub">もう一度挑戦しよう！</div>
-  <div class="ow-answer-card" style="border-color:rgba(239,83,80,.4);background:rgba(239,83,80,.07);">
-    <div class="ow-albl" style="color:#ef5350;">✗ あなたの答え</div>
-    <div class="ow-answer" id="ow-picked" style="color:#ef5350;"></div>
+  <div class="ow-answer-card" style="border-color:rgba(239,83,80,.5);background:rgba(239,83,80,.13);">
+    <div class="ow-albl" style="color:#c62828;">✗ あなたの答え</div>
+    <div class="ow-answer" id="ow-picked" style="color:#c62828;"></div>
   </div>
   <div class="ow-answer-card">
     <div class="ow-albl">⭕ 正解は…</div>
@@ -758,7 +758,7 @@ button{cursor:pointer;border:none;outline:none;font-family:inherit;}
 <div id="screen-shop" class="screen">
   <div class="an-header">
     <div class="an-title-txt">🛒 ショップ</div>
-    <div class="shop-points">💎 <span id="shop-points-val">0</span> <small>ことばポイント</small></div>
+    <div class="shop-points">💎 <span id="shop-points-val">0</span> <small>えいごポイント</small></div>
   </div>
   <div class="an-body">
     <div class="shop-cat-tabs" id="shop-cat-tabs"></div>
@@ -868,13 +868,13 @@ const LV_INFO={
   18:{name:"英検®2級相当 後編", grade:"高卒相当", icon:"📗",color:"#673AB7",dark:"#1f1330",stage_desc:"会話・読解（2級相当）"},
 };
 // ランクシステム（xp=その段位の最低XP）
-// レベル式: Lv = floor(√(XP÷10))  →  Lv1000 = 10,000,000 XP
+// レベル式: Lv = floor(√(XP÷10))  →  Lv500 = 2,500,000 XP（レベル上限500）
 // 各レベルに必要な累計XP: n*n*10
-function xpToLevel(xp){return Math.min(1000,Math.floor(Math.sqrt(xp/10)));}
+function xpToLevel(xp){return Math.min(500,Math.floor(Math.sqrt(xp/10)));}
 function totalXPForLevel(n){return n*n*10;}
 function getLevelInfo(xp){
   const lv=xpToLevel(xp);
-  if(lv>=1000)return{lv:1000,cur:xp,pct:100,need:0,toNext:0};
+  if(lv>=500)return{lv:500,cur:xp,pct:100,need:0,toNext:0};
   const base=totalXPForLevel(lv);
   const next=totalXPForLevel(lv+1);
   const span=next-base;
@@ -894,22 +894,22 @@ const STAGE_NAMES={
 
 // ランク称号（累計XPで判定。レベルの節目に対応）
 const RANKS=[
-  {title:"見習いことば戦士",icon:"⚔️",color:"#9E9E9E",xp:0},          // Lv0〜
-  {title:"初級ことば戦士",icon:"⚔️",color:"#4CAF50",xp:1000},         // Lv10〜
-  {title:"中級ことば戦士",icon:"⚔️",color:"#2196F3",xp:9000},         // Lv30〜
-  {title:"上級ことば戦士",icon:"⚔️",color:"#FF9800",xp:36000,job:true},// Lv60〜
-  {title:"初級ことば騎士",icon:"⚔️",color:"#F44336",xp:100000},       // Lv100〜
-  {title:"中級ことば騎士",icon:"⚔️",color:"#9C27B0",xp:400000},       // Lv200〜
-  {title:"上級ことば騎士",icon:"⚔️",color:"#FFC107",xp:900000,job:true},// Lv300〜
-  {title:"ことば強者",icon:"⚔️",color:"#FF5722",xp:2025000,job:true},  // Lv450〜
-  {title:"ことば拳王",icon:"⚔️",color:"#795548",xp:3600000,job:true},  // Lv600〜
-  {title:"ことば帝王",icon:"⚔️",color:"#607D8B",xp:5625000,job:true},  // Lv750〜
-  {title:"ことば覇王",icon:"⚔️",color:"#E91E63",xp:7225000,job:true},  // Lv850〜
-  {title:"ことば魔王",icon:"⚔️",color:"#673AB7",xp:8464000,job:true},  // Lv920〜
-  {title:"ことば賢王",icon:"⚔️",color:"#00BCD4",xp:9409000},           // Lv970〜
-  {title:"皇帝",icon:"⚔️",color:"#FF6F00",xp:9801000},                 // Lv990〜
-  {title:"天帝",icon:"⚔️",color:"#FFC107",xp:9980010},                 // Lv999
-  {title:"知識神",icon:"⚔️",color:"#E040FB",xp:10000000},              // Lv1000
+  {title:"見習いえいご戦士",icon:"⚔️",color:"#9E9E9E",xp:0},          // Lv0〜
+  {title:"初級えいご戦士",icon:"⚔️",color:"#4CAF50",xp:250},          // Lv5〜
+  {title:"中級えいご戦士",icon:"⚔️",color:"#2196F3",xp:2250},         // Lv15〜
+  {title:"上級えいご戦士",icon:"⚔️",color:"#FF9800",xp:9000,job:true},// Lv30〜
+  {title:"初級えいご騎士",icon:"⚔️",color:"#F44336",xp:36000},        // Lv60〜
+  {title:"中級えいご騎士",icon:"⚔️",color:"#9C27B0",xp:100000},       // Lv100〜
+  {title:"上級えいご騎士",icon:"⚔️",color:"#FFC107",xp:225000,job:true},// Lv150〜
+  {title:"えいご強者",icon:"⚔️",color:"#FF5722",xp:400000,job:true},   // Lv200〜
+  {title:"えいご拳王",icon:"⚔️",color:"#795548",xp:784000,job:true},   // Lv280〜
+  {title:"えいご帝王",icon:"⚔️",color:"#607D8B",xp:1225000,job:true},  // Lv350〜
+  {title:"えいご覇王",icon:"⚔️",color:"#E91E63",xp:1600000,job:true},  // Lv400〜
+  {title:"えいご魔王",icon:"⚔️",color:"#673AB7",xp:1936000,job:true},  // Lv440〜
+  {title:"えいご賢王",icon:"⚔️",color:"#00BCD4",xp:2209000},           // Lv470〜
+  {title:"皇帝",icon:"⚔️",color:"#FF6F00",xp:2352250},                 // Lv485〜
+  {title:"天帝",icon:"⚔️",color:"#FFC107",xp:2450250},                 // Lv495〜
+  {title:"知識神",icon:"⚔️",color:"#E040FB",xp:2500000},               // Lv500
 ];
 
 
@@ -1359,7 +1359,7 @@ function confirmCreateAccount(){
 const LS={
   getXP:()=>parseInt(localStorage.getItem(ACC.prefix()+'xp')||'0'),
   setXP:v=>localStorage.setItem(ACC.prefix()+'xp',v),
-  // ことばポイント（使える残高）。XPと同時に貯まり、ショップで使うと減る
+  // えいごポイント（使える残高）。XPと同時に貯まり、ショップで使うと減る
   getPoints:()=>parseInt(localStorage.getItem(ACC.prefix()+'points')||'0'),
   setPoints:v=>localStorage.setItem(ACC.prefix()+'points',Math.max(0,v)),
   addPoints:n=>LS.setPoints(LS.getPoints()+n),
@@ -1407,7 +1407,7 @@ function addXP(amount){
   const old=LS.getXP();
   const nw=old+amount;
   LS.setXP(nw);
-  if(amount>0)LS.addPoints(amount); // XPと同額のことばポイントを付与（ショップで使える）
+  if(amount>0)LS.addPoints(amount); // XPと同額のえいごポイントを付与（ショップで使える）
   const oldRi=getRankIdx(old);
   const newRi=getRankIdx(nw);
   if(newRi>oldRi){
@@ -2411,9 +2411,9 @@ function buyAvatarsSelected(){
   if(fs.length===0)return;
   const total=fs.reduce((s,f)=>s+(AVATAR_PRICE[f]||0),0);
   const pts=LS.getPoints();
-  if(pts<total){alert(`ことばポイントが足りません。\n合計 ${total.toLocaleString()} ／ 所持 ${pts.toLocaleString()}（あと${(total-pts).toLocaleString()}）`);return;}
+  if(pts<total){alert(`えいごポイントが足りません。\n合計 ${total.toLocaleString()} ／ 所持 ${pts.toLocaleString()}（あと${(total-pts).toLocaleString()}）`);return;}
   const names=fs.map(f=>avatarName(f));
-  if(!confirm(`${fs.length}人のなかまを まとめて購入しますか？\n合計 ${total.toLocaleString()}ことばポイント\n\n`+names.join('、')))return;
+  if(!confirm(`${fs.length}人のなかまを まとめて購入しますか？\n合計 ${total.toLocaleString()}えいごポイント\n\n`+names.join('、')))return;
   LS.addPoints(-total);
   fs.forEach(f=>LS.addOwned(f));
   avatarSel.clear();
@@ -2428,9 +2428,9 @@ function buyWeaponsSelected(){
   const total=ids.reduce((s,id)=>s+(WEAPONS.find(x=>x.id===id)?.price||0),0);
   const pow=ids.reduce((s,id)=>s+(WEAPONS.find(x=>x.id===id)?.power||0),0);
   const pts=LS.getPoints();
-  if(pts<total){alert(`ことばポイントが足りません。\n合計 ${total.toLocaleString()} ／ 所持 ${pts.toLocaleString()}（あと${(total-pts).toLocaleString()}）`);return;}
+  if(pts<total){alert(`えいごポイントが足りません。\n合計 ${total.toLocaleString()} ／ 所持 ${pts.toLocaleString()}（あと${(total-pts).toLocaleString()}）`);return;}
   const names=ids.map(id=>WEAPONS.find(x=>x.id===id).name);
-  if(!confirm(`${ids.length}個の武器を まとめて購入しますか？\n合計 ${total.toLocaleString()}ことばポイント ／ 戦闘力 +${pow.toLocaleString()}\n\n`+names.join('、')))return;
+  if(!confirm(`${ids.length}個の武器を まとめて購入しますか？\n合計 ${total.toLocaleString()}えいごポイント ／ 戦闘力 +${pow.toLocaleString()}\n\n`+names.join('、')))return;
   LS.addPoints(-total);
   ids.forEach(id=>LS.addWeapon(id));
   weaponSel.clear();
@@ -2444,8 +2444,8 @@ function buyAvatar(encF){
   const unlockLv=AVATAR_UNLOCK[f]||0;
   if(LS.getOwned().includes(f)){renderShop();return;}
   if(getLevelInfo(LS.getXP()).lv<unlockLv){alert(`このなかまは Lv${unlockLv} になると買えるよ！`);return;}
-  if(LS.getPoints()<price){alert('ことばポイントが足りません。問題を解いて貯めよう！');return;}
-  if(!confirm(`「${avatarName(f)}」を ${price.toLocaleString()}ことばポイント で購入しますか？`))return;
+  if(LS.getPoints()<price){alert('えいごポイントが足りません。問題を解いて貯めよう！');return;}
+  if(!confirm(`「${avatarName(f)}」を ${price.toLocaleString()}えいごポイント で購入しますか？`))return;
   LS.addPoints(-price);
   LS.addOwned(f);
   renderShop();
@@ -2456,8 +2456,8 @@ function buyWeapon(id){
   const w=WEAPONS.find(x=>x.id===id);
   if(!w)return;
   if(LS.getWeapons().includes(id)){renderShop();return;}
-  if(LS.getPoints()<w.price){alert('ことばポイントが足りません。問題を解いて貯めよう！');return;}
-  if(!confirm(`「${w.name}」を ${w.price.toLocaleString()}ことばポイント で購入しますか？\n戦闘力 +${w.power.toLocaleString()}`))return;
+  if(LS.getPoints()<w.price){alert('えいごポイントが足りません。問題を解いて貯めよう！');return;}
+  if(!confirm(`「${w.name}」を ${w.price.toLocaleString()}えいごポイント で購入しますか？\n戦闘力 +${w.power.toLocaleString()}`))return;
   LS.addPoints(-w.price);
   LS.addWeapon(id);
   renderShop();
@@ -2494,13 +2494,13 @@ function setAvatar(encF){
 // ============ プロフィール ============
 function getJob(rank){
   const t=rank.title;
-  if(t.includes('見習い'))return'ことば見習い';
-  if(t.includes('初級ことば戦士')||t.includes('中級ことば戦士'))return'ことば戦士';
-  if(t.includes('上級ことば戦士'))return'ことば上忍';
-  if(t.includes('騎士'))return'ことば騎士';
-  if(t.includes('強者')||t.includes('拳王'))return'ことば拳士';
-  if(t.includes('帝王')||t.includes('覇王'))return'ことば覇者';
-  if(t.includes('魔王')||t.includes('賢王'))return'ことば賢者';
+  if(t.includes('見習い'))return'えいご見習い';
+  if(t.includes('初級えいご戦士')||t.includes('中級えいご戦士'))return'えいご戦士';
+  if(t.includes('上級えいご戦士'))return'えいご上忍';
+  if(t.includes('騎士'))return'えいご騎士';
+  if(t.includes('強者')||t.includes('拳王'))return'えいご拳士';
+  if(t.includes('帝王')||t.includes('覇王'))return'えいご覇者';
+  if(t.includes('魔王')||t.includes('賢王'))return'えいご賢者';
   if(t.includes('皇帝')||t.includes('天帝'))return'語彙大帝';
   return'語彙神';
 }
@@ -2517,7 +2517,7 @@ function renderProfile(){
   const totalAnswered=stats.totalAnswered||0;
   // 最高連続正解: 過去最高。現在更新中で過去最高を超えていればその数を表示
   const maxStreakDisp=Math.max(stats.maxStreak||0,stats.curStreak||0);
-  const points=LS.getPoints(); // ことばポイント（使える残高）
+  const points=LS.getPoints(); // えいごポイント（使える残高）
   const combat=combatPower();   // 戦闘力（学習＋武器）
 
   // 全ステージ情報（ロック含む）
@@ -2571,7 +2571,7 @@ function renderProfile(){
             </div>
             <div class="cgi-job-badge">⚔ 職業：${getJob(rank)}</div>
             <div class="cgi-xp-wrap">
-              <div class="cgi-xp-lbl"><span>${xp.toLocaleString()} XP</span><span>${lvInfo.lv<1000?`あと${lvInfo.toNext.toLocaleString()}`:'MAX'}</span></div>
+              <div class="cgi-xp-lbl"><span>${xp.toLocaleString()} XP</span><span>${lvInfo.lv<500?`あと${lvInfo.toNext.toLocaleString()}`:'MAX'}</span></div>
               <div class="cgi-xp-bar"><div class="cgi-xp-fill" style="width:${lvInfo.pct}%"></div></div>
             </div>
           </div>
@@ -2587,10 +2587,10 @@ function renderProfile(){
         <div class="cgi-table">
           <div class="cgi-row">
             <div class="cgi-cell"><span class="cgi-key">総獲得経験値</span><span class="cgi-val gold">${xp.toLocaleString()} XP</span></div>
-            <div class="cgi-cell"><span class="cgi-key">ことばポイント</span><span class="cgi-val gold">💎 ${points.toLocaleString()}</span></div>
+            <div class="cgi-cell"><span class="cgi-key">えいごポイント</span><span class="cgi-val gold">💎 ${points.toLocaleString()}</span></div>
           </div>
           <div class="cgi-row">
-            <div class="cgi-cell"><span class="cgi-key">次のLvまで</span><span class="cgi-val">${lvInfo.lv<1000?lvInfo.toNext.toLocaleString()+' XP':'MAX'}</span></div>
+            <div class="cgi-cell"><span class="cgi-key">次のLvまで</span><span class="cgi-val">${lvInfo.lv<500?lvInfo.toNext.toLocaleString()+' XP':'MAX'}</span></div>
             <div class="cgi-cell"><span class="cgi-key">総回答数</span><span class="cgi-val">${totalAnswered}問</span></div>
           </div>
           <div class="cgi-row">
