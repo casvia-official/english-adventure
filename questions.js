@@ -37,11 +37,11 @@ const QUESTIONS = [
   {lv:1, stage:"alpha", q:"アルファベットで いちばん さいごの 文字は どれ？", c:["Z", "W", "X", "Y"], a:0, kw:"Z", em:"🔚", yomi:"ゼット", rel:[], exp:"最後は Z。"},
   {lv:1, stage:"alpha", q:"アルファベットは ぜんぶで 何文字？", c:["26", "24", "25", "28"], a:0, kw:"26文字", em:"🔢", rel:[], exp:"A〜Z で26文字。"},
   {lv:1, stage:"alpha", q:"母音（ぼいん）だけ ならんでいるのは どれ？", c:["A, E, I, O, U", "B, C, D, F, G", "K, L, M, N, P", "W, X, Y, Z, V"], a:0, kw:"母音", em:"🔡", rel:[], exp:"母音は a・e・i・o・u の5つ。"},
-  {lv:1, stage:"phonics", q:"cat の さいしょの 音は どれ？", c:["/k/ ク", "/s/ ス", "/t/ トゥ", "/a/ ア"], a:0, kw:"c", em:"🐱", rel:[], exp:"c は /k/ の音。"},
-  {lv:1, stage:"phonics", q:"dog の さいしょの 音は どれ？", c:["/d/ ド", "/t/ トゥ", "/g/ グ", "/o/ オ"], a:0, kw:"d", em:"🐶", rel:[], exp:"d は /d/ の音。"},
-  {lv:1, stage:"phonics", q:"sun の さいしょの 音は どれ？", c:["/s/ ス", "/n/ ン", "/u/ ア", "/m/ ム"], a:0, kw:"s", em:"☀️", rel:[], exp:"s は /s/ の音。"},
-  {lv:1, stage:"phonics", q:"map の さいしょの 音は どれ？", c:["/m/ ム", "/p/ プ", "/a/ ア", "/b/ ブ"], a:0, kw:"m", em:"🗺️", rel:[], exp:"m は /m/ の音。"},
-  {lv:1, stage:"phonics", q:"fish の さいしょの 音は どれ？", c:["/f/ フ", "/sh/ シュ", "/i/ イ", "/h/ ハ"], a:0, kw:"f", em:"🐟", rel:[], exp:"f は /f/ の音。"},
+  {lv:1, stage:"alpha", q:"大文字の F の 小文字は どれ？", c:["f", "t", "l", "i"], a:0, kw:"F / f", em:"🔤", rel:[], yomi:"エフ", exp:"F の小文字は f。"},
+  {lv:1, stage:"alpha", q:"小文字の i の 大文字は どれ？", c:["I", "J", "L", "T"], a:0, kw:"i / I", em:"🔡", rel:[], yomi:"アイ", exp:"i の大文字は I。"},
+  {lv:1, stage:"alpha", q:"大文字の K の 小文字は どれ？", c:["k", "x", "h", "l"], a:0, kw:"K / k", em:"🔤", rel:[], yomi:"ケイ", exp:"K の小文字は k。"},
+  {lv:1, stage:"alpha", q:"ABC順で O の つぎは どれ？", c:["P", "N", "Q", "R"], a:0, kw:"ABC順", em:"🔢", rel:[], exp:"O→P の順。"},
+  {lv:1, stage:"alpha", q:"ABC順で W の つぎは どれ？", c:["X", "V", "Y", "U"], a:0, kw:"ABC順", em:"🔢", rel:[], exp:"W→X の順。"},
 
   // ===== Lv2  学習2 かず・いろ =====
   {lv:2, stage:"num", q:"1 は 英語で どれ？", c:["one", "two", "three", "four"], a:0, kw:"one", em:"1️⃣", yomi:"ワン", rel:[], exp:"1 は one。"},
